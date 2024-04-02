@@ -11,12 +11,21 @@ struct PokemonDetail: View {
     
     let pokemon: PokemonEntry
     
+    @State private var pokemonType: String = "Loading,..."
+    
+    
+//    init(pokemon: PokemonEntry, pokemonType: Binding<String>) {
+//            self.pokemon = pokemon
+//            self._pokemonType = pokemonType
+//
+//        }
+    
     var body: some View {
         ScrollView {
             VStack {
                 // Display the Pokemon image
-                Image(systemName: "photo")
-                    .resizable()
+                PokemonImage(imageLink: "\(pokemon.url)")
+//                    .resizable()
                     .frame(width: 200, height: 200)
                     .padding()
                 
@@ -30,8 +39,10 @@ struct PokemonDetail: View {
                     .font(.title)
                     .padding(.bottom)
                 
+//                Text()
+                
                 // Other details about the Pokemon
-                Text("Type: Grass")
+                Text("Type: \(pokemonType)")
                     .font(.headline)
                     .padding(.bottom)
                 
@@ -49,7 +60,20 @@ struct PokemonDetail: View {
             .padding()
         }
         .navigationTitle("Pokemon Detail")
+        .onAppear {
+            getType()
+        }
     }
+    
+    func getType(){
+        PokemonSelectedApi().getType(url: pokemon.url){ type in
+//            print("Fetched Pokémon type: \(type.type.name)")
+            let typeNames = type.map { $0.type.name }
+            self.pokemonType = typeNames.joined(separator: ", ")
+            
+        }
+    }
+    
 }
 
 #Preview {
