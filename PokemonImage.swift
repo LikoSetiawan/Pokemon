@@ -14,36 +14,44 @@ struct PokemonImage: View {
     var body: some View {
         AsyncImage(url: URL(string: pokemonSprite))
             .frame(width: 75, height: 75)
-            .onAppear {
-                let loadedData = UserDefaults.standard.string(forKey: imageLink)
-                
-                if loadedData == nil {
-                    getSprite(url: imageLink)
-                    UserDefaults.standard.set(imageLink, forKey: imageLink)
-                    //print("New url!!! Caching...")
-                } else {
-                    getSprite(url: loadedData!)
-                    //print("Using cached url...")
-                }
-                //print(pokemonSprite)
-            }
+
             .clipShape(Circle())
             .foregroundColor(Color.gray.opacity(0.60))
             .scaledToFit()
+            .task {
+                await getSprite()
+            }
         
     }
     
-    func getSprite(url: String) {
-        var tempSprite: String?
-        PokemonSelectedApi().getSprite(url: url) { sprite in
-            tempSprite = sprite.front_default
-            self.pokemonSprite = tempSprite ?? "placeholder"
+    func getSprite() async {
+        guard let url = URL(string: imageLink) else {
+            print("invalid url")
+            return }
+        
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let decodedSprites = try? JSONDecoder().decode(PokemonSelected.self, from: data){
+                if let frontDefault = decodedSprites.sprites.front_default {
+                    pokemonSprite = frontDefault
+                }
+                
+                
+            }
+            
+        } catch {
+            print("Invalid URL")
         }
         
-    }
+        }
 }
 
 #Preview {
     PokemonImage()
-        .previewInterfaceOrientation(.portrait)
+//        .previewInterfaceOrientation(.portrait)
 }
+
+
+//tempSprite = sprite.front_default
+//self.pokemonSprite = tempSprite ?? "placeholder"

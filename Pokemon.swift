@@ -7,28 +7,42 @@
 
 import Foundation
 
-struct Pokemon : Codable{
-    var results: [PokemonEntry]
+struct PokemonEntry: Codable {
+    var results : [Pokemon]
 }
 
-struct PokemonEntry : Codable, Identifiable  {
-    let id = UUID()
-    var name: String
-    var url: String
+struct Pokemon: Codable, Hashable{
+//    let id: UUID
+    var name : String
+    var url : String
+    
+    static let example = Pokemon(name: "Bulbasaur", url: "Pokeapibulsaur")
 }
 
-class PokeApi  {
-    func getData(completion:@escaping ([PokemonEntry]) -> ()) {
-        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=151") else { return }
-        
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard let data = data else { return }
-            
-            let pokemonList = try! JSONDecoder().decode(Pokemon.self, from: data)
-            
-            DispatchQueue.main.async {
-                completion(pokemonList.results)
-            }
-        }.resume()
-    }
-}
+
+//
+//
+//                Rectangle()
+//                    .frame(height: 2)
+//                    .foregroundStyle(.black)
+//                    .padding(.vertical)
+//
+//                // Display the Pokemon name
+//                Text(pokemon.name.capitalized)
+//                    .font(.title)
+//
+//                // Other details about the Pokemon
+//                Text("Type: \(pokemonTypes)")
+//                    .font(.headline)
+//                    .padding(.bottom)
+//
+//                VStack(alignment: .leading, spacing: 10) {
+//                    Text("Abilities:")
+//                        .font(.headline)
+//
+//                    Text("- Overgrow")
+//                        .foregroundColor(.secondary)
+//                }
+//                .padding(.bottom)
+
+// Add more details as needed

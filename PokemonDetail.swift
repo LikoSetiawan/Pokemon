@@ -8,74 +8,138 @@
 import SwiftUI
 
 struct PokemonDetail: View {
+    let pokemon: Pokemon
+    @State private var pokemonDefaultSprite = ""
+    @State private var pokemonTypes = [String]()
     
-    let pokemon: PokemonEntry
+    @State private var movesInfo = [Move]()
     
-    @State private var pokemonType: String = "Loading,..."
+
     
-    
-//    init(pokemon: PokemonEntry, pokemonType: Binding<String>) {
-//            self.pokemon = pokemon
-//            self._pokemonType = pokemonType
-//
-//        }
+    let columns = [
+        GridItem(.adaptive(minimum: 80))
+    ]
     
     var body: some View {
-        ScrollView {
-            VStack {
-                // Display the Pokemon image
-                PokemonImage(imageLink: "\(pokemon.url)")
-//                    .resizable()
-                    .frame(width: 200, height: 200)
-                    .padding()
-                
-                Rectangle()
-                    .frame(height: 2)
-                    .foregroundStyle(.black)
-                    .padding(.vertical)
-                
-                // Display the Pokemon name
-                Text(pokemon.name.capitalized)
-                    .font(.title)
-                    .padding(.bottom)
-                
-//                Text()
-                
-                // Other details about the Pokemon
-                Text("Type: \(pokemonType)")
-                    .font(.headline)
-                    .padding(.bottom)
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Abilities:")
-                        .font(.headline)
+        GeometryReader { proxy in
+            ScrollView {
+                VStack {
+                    ZStack {
+                        Color(hex: 0xEDF7FF)
+                            .frame(width: proxy.size.width, height: proxy.size.height * 0.4)
+                        VStack{
+                            Spacer()
+                            Spacer()
+                            HStack(spacing: 12){
+                                ForEach(pokemonTypes, id: \.self) { type in
+                                    Text(type.capitalized)
+                                        .padding(10)
+                                        .foregroundStyle(.white)
+                                        .font(.headline.bold())
+                                        .background(typeColors[type])
+                                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .padding()
+                            .padding(.bottom, -90)
+                           
+                            Spacer()
+                            
+                            AsyncImage(url: URL(string: pokemonDefaultSprite)){ image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 200, height: 200)
+                                
+                            } placeholder: {
+                                ProgressView()
+                                    .frame(width: 200, height: 200)
+                                
+                            }
+                            .padding(.bottom, -50)
+                        }
+                    }
+                    Rectangle()
+                        .frame(height: 5)
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 35)
                     
-                    Text("- Overgrow")
-                        .foregroundColor(.secondary)
+                    Text("Moves")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .font(.title.bold())
+                    
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(movesInfo, id: \.name) { move in
+                            HStack {
+//                                MovesCardView(movesLink: move.url)
+                                Text(move.url)
+                                Text(move.name)
+                                    .padding(8)
+                                    .foregroundColor(.black)
+                                    .background(Color.blue)
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            
+                        }
+                    }
                 }
-                .padding(.bottom)
-                
-                // Add more details as needed
             }
-            .padding()
+            
+            
         }
-        .navigationTitle("Pokemon Detail")
-        .onAppear {
-            getType()
+        .navigationTitle(pokemon.name.capitalized)
+        .ignoresSafeArea()
+        
+        .task {
+            await getPokemonInfo()
         }
     }
     
-    func getType(){
-        PokemonSelectedApi().getType(url: pokemon.url){ type in
-//            print("Fetched Pokémon type: \(type.type.name)")
-            let typeNames = type.map { $0.type.name }
-            self.pokemonType = typeNames.joined(separator: ", ")
+    func getPokemonInfo() async {
+        guard let url = URL(string: pokemon.url) else { return }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
             
+            if let decodedPokemon = try? JSONDecoder().decode(PokemonSelected.self, from: data) {
+                
+                // Get Pokemon Types
+                pokemonTypes = decodedPokemon.types.map { $0.type.name }
+                
+                // Get Sprites
+                if let frontDefault = decodedPokemon.sprites.other.home.front_default {
+                    pokemonDefaultSprite = frontDefault
+                }
+                
+                // Get Pokemon Moves and their URL
+                movesInfo = decodedPokemon.moves.prefix(4).map {
+                    move in
+                    let moveName = move.move.name.replacingOccurrences(of: "-", with: " ")
+                    return Move(name: moveName, url: move.move.url)
+                    
+                }
+//                print(movesInfo)
+                
+                
+                
+            }
+            
+        } catch {
+            print("failed to fetch pokemon details : \(error.localizedDescription)")
         }
+        
     }
     
 }
 
 #Preview {
-    PokemonDetail(pokemon : PokemonEntry(name: "Bulba", url: "dummy.com"))
+    PokemonDetail(pokemon: .example)
 }
+
+
+// Elsys (wa.me/6285163544100
+
+
