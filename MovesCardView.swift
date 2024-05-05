@@ -15,8 +15,9 @@ struct MovesCardView: View {
     var body: some View {
             Text(movesTypes.capitalized)
                 .padding(8)
-                .foregroundColor(.black)
+                .foregroundColor(.white)
                 .background(typeColors[movesTypes])
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 .task {
                     await getMoveTypes()
                 }

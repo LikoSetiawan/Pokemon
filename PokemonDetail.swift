@@ -14,10 +14,11 @@ struct PokemonDetail: View {
     
     @State private var movesInfo = [Move]()
     
-
+    @State private var isShowingPokeballs = false
     
     let columns = [
-        GridItem(.adaptive(minimum: 80))
+        GridItem(.fixed(165)),
+        GridItem(.flexible()),
     ]
     
     var body: some View {
@@ -65,26 +66,41 @@ struct PokemonDetail: View {
                         .frame(height: 5)
                         .foregroundStyle(.white)
                         .padding(.vertical, 35)
+                        
                     
                     Text("Moves")
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .font(.title.bold())
+                        
                     
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(movesInfo, id: \.name) { move in
-                            HStack {
-//                                MovesCardView(movesLink: move.url)
-                                Text(move.url)
-                                Text(move.name)
-                                    .padding(8)
-                                    .foregroundColor(.black)
-                                    .background(Color.blue)
+                            VStack {
+                                Text(move.name.capitalized)
+                                MovesCardView(movesLink: move.url)
+                                    
                             }
+                            .frame(width: 150, height: 80)
+                            .background(Color(hex: 0xd5dee5))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                             
                         }
                     }
+                    .padding()
+                    
+                    Button("Catch This Pokemon") {
+                        print("It has to be 50 50 change to get the pokemon")
+                        isShowingPokeballs.toggle()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .buttonStyle(.borderedProminent)
+                    
+                    
+                    
+                    
+                    
+                    
                 }
             }
             
@@ -92,7 +108,10 @@ struct PokemonDetail: View {
         }
         .navigationTitle(pokemon.name.capitalized)
         .ignoresSafeArea()
-        
+        .sheet(isPresented: $isShowingPokeballs) {
+            PokeballsView()
+                .presentationDetents([.height(300)])
+        }
         .task {
             await getPokemonInfo()
         }

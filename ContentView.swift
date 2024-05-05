@@ -9,6 +9,7 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var pokemons = [Pokemon]()
+    @State private var isShowingListPokemon = false
     
     var body: some View {
         NavigationStack {
@@ -28,6 +29,16 @@ struct ContentView: View {
             .task {
                 await fetchPokemons()
             }
+            .toolbar {
+                Button("My Pokemon List") {
+                    isShowingListPokemon.toggle()
+                }
+                .buttonStyle(.plain)
+                .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 2)
+            }
+            .sheet(isPresented: $isShowingListPokemon) {
+                MyPokemonListView()
+            }
         }
       
     }
@@ -40,10 +51,8 @@ struct ContentView: View {
         
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-//            print(data)
             if let decodedData = try? JSONDecoder().decode(PokemonEntry.self, from: data){
                 pokemons = decodedData.results
-//                print(pokemons)
             }
             
         } catch{
@@ -51,9 +60,6 @@ struct ContentView: View {
         }
     }
     
-//    func fetchPokemonData() async{
-//        guard let url = URL(string: pokemon.url)
-//    }
 }
 
 #Preview {
