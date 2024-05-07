@@ -9,21 +9,27 @@ import SwiftUI
 
 struct MyPokemonListView: View {
     @Environment(\.dismiss) var dismiss
+    @State private var caughtPokemons = [CaughtPokemon]()
+    
     
     var body: some View {
         NavigationStack{
-            Text("this should be your pokemon list")
-                .navigationTitle("My Pokemon")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            dismiss()
-                        }) {
-                           Text("Back")
-                                
-                        }
+            List(caughtPokemons) { item in
+                Text(item.name)
+                
+                
+            }
+            .navigationTitle("My Pokemon")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Text("Back")
+                        
                     }
                 }
+            }
         }
     }
 }

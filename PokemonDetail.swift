@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PokemonDetail: View {
     let pokemon: Pokemon
+    @Environment(Favorites.self) var favorites
+    
     @State private var pokemonDefaultSprite = ""
     @State private var pokemonTypes = [String]()
     
@@ -115,6 +117,20 @@ struct PokemonDetail: View {
         .task {
             await getPokemonInfo()
         }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add to Favorites", systemImage: "heart.fill") {
+                    if favorites.contains(pokemon) {
+                        favorites.remove(pokemon)
+                    } else {
+                        favorites.add(pokemon)
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(favorites.contains(pokemon) ? .red : .gray)
+                
+            }
+        }
     }
     
     func getPokemonInfo() async {
@@ -156,6 +172,7 @@ struct PokemonDetail: View {
 
 #Preview {
     PokemonDetail(pokemon: .example)
+        .environment(Favorites())
 }
 
 

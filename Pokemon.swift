@@ -11,10 +11,12 @@ struct PokemonEntry: Codable {
     var results : [Pokemon]
 }
 
-struct Pokemon: Codable, Hashable{
-//    let id: UUID
+struct Pokemon: Codable, Hashable, Identifiable{
+    
     var name : String
     var url : String
+    
+    var id: String { name }
     
     static let example = Pokemon(name: "Bulbasaur", url: "Pokeapibulsaur")
 }

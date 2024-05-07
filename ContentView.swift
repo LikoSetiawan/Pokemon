@@ -9,16 +9,22 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var pokemons = [Pokemon]()
+    @State private var favorites = Favorites()
     @State private var isShowingListPokemon = false
     
     var body: some View {
         NavigationStack {
-            List(pokemons, id: \.self) { pokemon in
+            List(pokemons) { pokemon in
                 NavigationLink(value: pokemon){
                     HStack{
                         PokemonImage(imageLink: pokemon.url)
                         Text(pokemon.name.capitalized)
                         
+                        if favorites.contains(pokemon) {
+                            Spacer()
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(.red)
+                        }
                     }
                 }
             }
@@ -39,7 +45,9 @@ struct ContentView: View {
             .sheet(isPresented: $isShowingListPokemon) {
                 MyPokemonListView()
             }
+           
         }
+        .environment(favorites)
       
     }
     
