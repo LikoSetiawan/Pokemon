@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PokeballsView: View {
     @State private var pokeballs = [PKMNItemBalls]()
+    @State private var caughtViewModel = PKMNcaughtViewModel()
+    let pokemon: Pokemon
     
     let columns = [
         GridItem(.flexible()),
@@ -28,6 +30,9 @@ struct PokeballsView: View {
                         Button() {
                             catchResult = catchPokemon(pokeball: pokeball)
                             isAlertShow.toggle()
+                            if let catchResult = catchResult {
+                                caughtViewModel.add(name: pokemon.name, pokeball: catchResult)
+                            }
                         } label : {
                             VStack{
                                 PokeballImage(imageLink: pokeball.url)
@@ -51,7 +56,7 @@ struct PokeballsView: View {
                 
                 
             }
-            .navigationTitle("Select Pokeball To Catch")
+            .navigationTitle("Select Pokeball To Catch \(pokemon.name.capitalized)")
             .navigationBarTitleDisplayMode(.inline)
         }
         .task {
@@ -88,5 +93,5 @@ struct PokeballsView: View {
 }
 
 #Preview {
-    PokeballsView()
+    PokeballsView(pokemon: .example)
 }

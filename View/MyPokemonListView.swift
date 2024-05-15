@@ -9,12 +9,14 @@ import SwiftUI
 
 struct MyPokemonListView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var caughtPokemons = [CaughtPokemon]()
+    
+    
+    var caughtViewModels: PKMNcaughtViewModel
     
     
     var body: some View {
         NavigationStack{
-            List(caughtPokemons) { item in
+            List(caughtViewModels.caughtPokemon) { item in
                 Text(item.name)
                 
                 
@@ -35,5 +37,5 @@ struct MyPokemonListView: View {
 }
 
 #Preview {
-    MyPokemonListView()
+    MyPokemonListView(caughtViewModels: PKMNcaughtViewModel())
 }

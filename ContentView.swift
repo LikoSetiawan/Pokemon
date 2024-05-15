@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var favorites = Favorites()
     @State private var isShowingListPokemon = false
     
+    @State private var caughtViewModel = PKMNcaughtViewModel()
+    
     var body: some View {
         NavigationStack {
             List(pokemons) { pokemon in
@@ -43,7 +45,7 @@ struct ContentView: View {
                 .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 2)
             }
             .sheet(isPresented: $isShowingListPokemon) {
-                MyPokemonListView()
+                MyPokemonListView(caughtViewModels: caughtViewModel)
             }
            
         }

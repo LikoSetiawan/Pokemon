@@ -111,7 +111,7 @@ struct PokemonDetail: View {
         .navigationTitle(pokemon.name.capitalized)
         .ignoresSafeArea()
         .sheet(isPresented: $isShowingPokeballs) {
-            PokeballsView()
+            PokeballsView(pokemon: pokemon)
                 .presentationDetents([.height(300)])
         }
         .task {
